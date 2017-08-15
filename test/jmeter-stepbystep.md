@@ -1,11 +1,17 @@
 #### 分布式测试实施步骤及要点：
 * 1、master和slaver上安装同版本jdk和jmeter，并确保两机处于同一局域网，可相互访问。  
 由于防火墙可能阻挡rmi访问请暂时关闭防火墙。
-由于多个网卡可能导致master和slaver找不到对方ip从而导致不成功，请暂时禁用无关网卡
+由于多个网卡可能导致master和slaver找不到对方ip，报错java.rmi.ConnectException: Connection refused to host，可以暂时禁用无关网卡
 * 2、master和slaver上设置好jmeter的环境变量JMETER_HOME、PATH和CLASS_PATH
-* 3、master和slaver上%JMETER_HOME%/bin/jmeter-server文件添加行  
+* 3、slaver上%JMETER_HOME%/bin/jmeter-server.bat文件修改，解决多网卡问题
 ```
- RMI_HOST_DEF=-Djava.rmi.server.hostname=本机IP
+ 添加行  
+ set RMI_HOST_DEF=-Djava.rmi.server.hostname=本机IP
+ 
+ call jmeter的命令里增加%RMI_HOST_DEF%，如下  
+ call jmeter %RMI_HOST_DEF% -s -j jmeter-server.log %JMETER_CMD_LINE_ARGS%
+ 。。。
+ call jmeter %RMI_HOST_DEF% -Dserver_port=%SERVER_PORT% -s -j jmeter-server.log %JMETER_CMD_LINE_ARGS%
 ```
 * 4、master上%JMETER_HOME%/bin/jmeter.bat文件中添加行  
 ```
